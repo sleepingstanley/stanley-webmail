@@ -2,13 +2,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const passport = require('passport');
-const passportConfig = require('./lib/passport');
+const multer = require('multer');
 
+const passportConfig = require('./lib/passport');
 const config = require('./config');
 
 const app = express();
 app.use(bodyParser.json());
 app.use(passport.initialize());
+app.use(multer());
 
 require('./models').connect(config.mongoURI).then(() => {
   passportConfig.init(passport);

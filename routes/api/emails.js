@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const async = require('async');
 const models = require('mongoose').models;
+const multer = require('multer');
+const upload = multer();
 
 const passportConfig = require('../../lib/passport');
 const ParseURL = process.env.WEBMAIL_PARSE_URL || 'incoming';
@@ -12,7 +14,8 @@ router.get('/', passportConfig.checkAuth, (req, res) => {
   });
 });
 
-router.post(`/${ParseURL}`, (req, res) => {
+
+router.post(`/${ParseURL}`, upload.any(), (req, res) => {
   console.log(req.body);
   new models.Email({
     to: req.body.to,
