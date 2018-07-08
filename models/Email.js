@@ -18,7 +18,10 @@ const EmailSchema = new Schema({
   },
   spamFilter: {
     score: Number,
-    pass: Boolean
+    pass: {
+      type: Boolean,
+      default: true
+    }
   },
   subject: String,
   text: String,

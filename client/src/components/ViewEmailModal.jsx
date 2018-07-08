@@ -5,10 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/pro-light-svg-icons'
 
 import { connect } from 'react-redux';
-import { sendEmail } from '../actions/emailActions';
 import PropTypes from 'prop-types';
 
-class EmailModal extends Component {
+class ViewEmailModal extends Component {
   state = {
     modalOpen: false
   }
@@ -27,12 +26,13 @@ class EmailModal extends Component {
     e.preventDefault();
 
     const newEmail = {
-      from: this.state.from_name && this.state.from_email ? `${this.state.from_name} <${this.state.from_email}>` : (this.state.from_name || this.state.from_email),
-      spam_score: 0,
-      SPF: 'pass',
+      to: this.state.to,
+      from: {
+        email: this.state.from_email,
+        name: this.state.from_name
+      },
       subject: this.state.subject,
-      text: this.state.body,
-      to: this.state.to
+      body: this.state.body,
     };
 
     this.props.sendEmail(newEmail);
@@ -74,8 +74,7 @@ class EmailModal extends Component {
   }
 }
 
-EmailModal.propTypes = {
-  sendEmail: PropTypes.func.isRequired,
+ViewEmailModal.propTypes = {
   email: PropTypes.object.isRequired
 }
 
@@ -83,4 +82,4 @@ const mapStateToProps = state => ({
   email: state.email
 });
 
-export default connect(mapStateToProps, { sendEmail })(EmailModal);
+export default connect(mapStateToProps)(ViewEmailModal);

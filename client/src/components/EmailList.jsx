@@ -52,7 +52,7 @@ class EmailList extends Component {
   render() {
     const { emails } = this.props.email;
     return (
-      <div>
+      <div style={{ marginBottom: '10px' }}>
         <Menu attached>
           <Popup trigger={
             <Menu.Item>
@@ -96,14 +96,14 @@ class EmailList extends Component {
         </Menu>
         <Table basic selectable attached>
           <Table.Body>
-            {emails.map(({ _id, from, subject, date, read, body }) => (
+            {emails.map(({ _id, from, subject, date, read, text }) => (
               <Table.Row key={_id} active={this.state.checkboxes.has(_id)} style={read ? {} : { fontWeight: 'bold' }}>
                 <Table.Cell collapsing>
                   <Checkbox checked={this.state.checkboxes.has(_id)} onChange={this.toggleCheckbox.bind(this, _id, read)} />
                 </Table.Cell>
                 <Table.Cell collapsing>{from ? (from.name || from.email) : 'no sender'}</Table.Cell>
                 <Table.Cell>
-                  {subject || 'no subject'} - <span style={{ fontWeight: '300' }}>{body ? body.substring(0, 100) : 'no message'}</span>
+                  {subject || 'no subject'} - <span style={{ fontWeight: '300' }}>{(text || 'no content').substring(0, 500)}</span>
                 </Table.Cell>
                 <Table.Cell collapsing textAlign='right'>
                   <Moment fromNow date={date} />

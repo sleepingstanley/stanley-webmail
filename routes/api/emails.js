@@ -5,8 +5,8 @@ const models = require('mongoose').models;
 const multer = require('multer');
 const upload = multer();
 
+const config = require('../../config');
 const passportConfig = require('../../lib/passport');
-const ParseURL = process.env.WEBMAIL_PARSE_URL || 'incoming';
 
 router.get('/', passportConfig.checkAuth, (req, res) => {
   models.Email.find().sort({ date: -1 }).then(emails => {
@@ -15,17 +15,16 @@ router.get('/', passportConfig.checkAuth, (req, res) => {
 });
 
 
-router.post(`/${ParseURL}`, upload.any(), (req, res) => {
-  let dataFrom = req.body.from, from;
-  if ((start = dataFrom.indexOf(' <')) !== -1 && (end = dataFrom.indexOf('>')) !== -1) {
-    from = {
-      name: dataFrom.substring(0, start).trim(),
-      email: dataFrom.substring(start + 2, end).trim()
-    };
-  } else {
-    from = {
-      email: dataFrom
-    };
+router.post(`/${config.parseURL}`, upload.any(), (req, res) => {
+  let dataFrom = req.body.from, from = { email: dataFrom };
+  if (dataFrom) {
+    let start = dataFrom.indexOf('<'), end = dataFrom.indexOf('>');
+    if (dataFrom.indexOf(' ') !== -1) {
+      from = {
+        name: dataFrom.substring(0, start).trim(),
+        email: dataFrom.substring(start + 1, end).trim()
+      };
+    } else from = { email: dataFrom.substring(start + 1, end).trim() };
   }
 
   console.log(req.body);

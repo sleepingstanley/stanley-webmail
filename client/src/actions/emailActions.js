@@ -11,8 +11,8 @@ export const getEmails = () => dispatch => {
   }).then(res => dispatch({ type: GET_EMAILS, payload: res.data }));
 };
 
-export const sendEmail = item => dispatch => {
-  axios.post('/api/emails/parse', item, {
+export const sendEmail = email => dispatch => {
+  axios.post('/api/emails/parse', email, {
     headers: {
       Authorization: `Bearer ${Auth.getToken()}`
     }
