@@ -3,7 +3,6 @@ const Schema = mongoose.Schema;
 
 const EmailSchema = new Schema({
   attachments: [{}],
-  body: String,
   date: {
     type: Date,
     default: Date.now
@@ -12,11 +11,17 @@ const EmailSchema = new Schema({
     name: String,
     email: String
   },
+  html: String,
   read: {
     type: Boolean,
     default: false
   },
+  spamFilter: {
+    score: Number,
+    pass: Boolean
+  },
   subject: String,
+  text: String,
   to: String
 });
 

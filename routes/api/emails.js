@@ -16,12 +16,30 @@ router.get('/', passportConfig.checkAuth, (req, res) => {
 
 
 router.post(`/${ParseURL}`, upload.any(), (req, res) => {
+  let dataFrom = req.body.from, from;
+  if ((start = dataFrom.indexOf(' <')) !== -1 && (end = dataFrom.indexOf('>')) !== -1) {
+    from = {
+      name: dataFrom.substring(0, start).trim(),
+      email: dataFrom.substring(start + 2, end).trim()
+    };
+  } else {
+    from = {
+      email: dataFrom
+    };
+  }
+
   console.log(req.body);
+
   new models.Email({
-    to: req.body.to,
-    from: req.body.from,
+    from: from,
+    html: req.body.html,
+    spamFilter: {
+      score: req.body.spam_score,
+      pass: req.body.SPF === 'pass'
+    },
     subject: req.body.subject,
-    body: req.body.body,
+    text: req.body.text,
+    to: req.body.to
     //date: Date,
   }).save().then(email => res.json(email));
 });

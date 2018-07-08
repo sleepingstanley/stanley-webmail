@@ -62,33 +62,4 @@ router.post('/login', [
 
 router.post('/update', passportConfig.updateAuth);
 
-/*router.post(`/update`, (req, res) => {
-  let data = new Array();
-
-  async.each(req.body.data, (element, callback) => {
-    Email.findOneAndUpdate({ _id: element._id }, element.data, { new: true }, (err, email) => {
-      if (err)
-        return callback(err);
-      data.push(email);
-      callback();
-    });
-  }, (err) => {
-    if (err)
-      return res.status(404).json({ success: false });
-    return res.json({ success: true, data: data });
-  });
-});
-
-router.post('/delete', (req, res) => {
-  async.each(req.body.data, (_id, callback) => {
-    Email.findByIdAndRemove(_id)
-      .then(() => callback())
-      .catch(err => callback(err));
-  }, (err) => {
-    if (err)
-      return res.status(404).json({ success: false });
-    return res.json({ success: true });
-  });
-});*/
-
 module.exports = router;
