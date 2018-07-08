@@ -17,14 +17,14 @@ require('./models').connect(config.mongoURI).then(() => {
   passportConfig.init(passport);
 });
 
-app.use('/api/emails', require(path.join(__dirname, './routes/api/emails')));
-app.use('/api/auth', require(path.join(__dirname, './routes/api/auth')));
+app.use('/api/emails', './routes/api/emails');
+app.use('/api/auth', './routes/api/auth');
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(require(path.join(__dirname, './client/build'))));
+  app.use(express.static(('client/build')));
 
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
   });
 }
 
