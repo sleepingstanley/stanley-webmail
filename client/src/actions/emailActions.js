@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { GET_EMAILS, DELETE_EMAIL, SEND_EMAIL, EMAILS_LOADING, UPDATE_EMAIL } from './constants';
+import { GET_EMAILS, GET_EMAIL, DELETE_EMAIL, SEND_EMAIL, EMAILS_LOADING, UPDATE_EMAIL } from './constants';
 import Auth from '../modules/auth';
 
 export const getEmails = () => dispatch => {
@@ -9,6 +9,21 @@ export const getEmails = () => dispatch => {
       Authorization: `Bearer ${Auth.getToken()}`
     }
   }).then(res => dispatch({ type: GET_EMAILS, payload: res.data }));
+};
+
+export const getEmail = id => dispatch => {
+  return new Promise((resolve, reject) => {
+    axios.get(`/api/emails/${id}`, {
+      headers: {
+        Authorization: `Bearer ${Auth.getToken()}`
+      }
+    }).then(res => {
+      dispatch({ type: GET_EMAIL, payload: res.data });
+      resolve();
+    }).catch(err => {
+      reject(err);
+    });
+  });
 };
 
 export const sendEmail = email => dispatch => {

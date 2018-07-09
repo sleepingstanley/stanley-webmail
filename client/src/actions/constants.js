@@ -1,4 +1,5 @@
 export const GET_EMAILS = 'GET_EMAILS';
+export const GET_EMAIL = 'GET_EMAIL';
 export const DELETE_EMAIL = 'DELETE_EMAIL';
 export const SEND_EMAIL = 'SEND_EMAIL';
 export const EMAILS_LOADING = 'EMAILS_LOADING';

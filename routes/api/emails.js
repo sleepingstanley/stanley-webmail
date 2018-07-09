@@ -8,12 +8,22 @@ const upload = multer();
 const config = require('../../config');
 const passportConfig = require('../../lib/passport');
 
+const { sanitizeParam } = require('express-validator/filter');
+
 router.get('/', passportConfig.checkAuth, (req, res) => {
-  models.Email.find().sort({ date: -1 }).then(emails => {
+  models.Email.find(admin ? {} : { to: res.locals.user.email }, { from: true, read: true, text: true }).sort({ date: -1 }).then(emails => {
     res.json(emails);
   });
 });
 
+router.get('/:id', sanitizeParam('id').trim(), passportConfig.checkAuth, (req, res) => {
+  models.Email.findOne({ _id: req.params.id }, { __v: false }, (err, email) => {
+    if (err)
+      return res.status(400).json({ success: false, error: err });
+
+    res.json(email);
+  });
+});
 
 router.post(`/${config.parseURL}`, upload.any(), (req, res) => {
   let dataFrom = req.body.from, from = { email: dataFrom };
@@ -38,7 +48,7 @@ router.post(`/${config.parseURL}`, upload.any(), (req, res) => {
     },
     subject: req.body.subject,
     text: req.body.text,
-    to: req.body.to
+    to: req.body.to.split(', ')
     //date: Date,
   }).save().then(email => res.json(email));
 });

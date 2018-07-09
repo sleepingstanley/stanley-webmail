@@ -9,7 +9,6 @@ import { reauthenticateUser } from '../../actions/authActions';
 
 import EmailList from '../EmailList';
 import EmailModal from '../EmailModal';
-import ViewEmailModal from '../ViewEmailModal';
 
 class Home extends Component {
   componentDidMount() {
@@ -26,7 +25,6 @@ class Home extends Component {
         <Header as='h1'>{user.name} - {user.email}</Header>
         <EmailList />
         <EmailModal />
-        <ViewEmailModal />
       </div>
     );
   }

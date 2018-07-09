@@ -103,7 +103,7 @@ class EmailList extends Component {
                 </Table.Cell>
                 <Table.Cell collapsing>{from ? (from.name || from.email) : 'no sender'}</Table.Cell>
                 <Table.Cell>
-                  {subject || 'no subject'} - <span style={{ fontWeight: '300' }}>{(text || 'no content').substring(0, 500)}</span>
+                  {subject || 'no subject'} - <span style={{ fontWeight: '300' }}>{(text || 'no content').substring(0, 75)}</span>
                 </Table.Cell>
                 <Table.Cell collapsing textAlign='right'>
                   <Moment fromNow date={date} />
