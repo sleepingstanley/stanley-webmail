@@ -31,7 +31,7 @@ let filterEmailString = (name) => {
 
 router.get('/', passportConfig.checkAuth, (req, res) => {
   let user = res.locals.user;
-  models.Email.find(user.admin ? {} : { to: user.email }, 'from read text to').sort({ date: -1 }).then(emails => {
+  models.Email.find(user.admin ? {} : { 'to.email': user.email }, 'from read text subject to').sort({ date: -1 }).then(emails => {
     res.json(emails);
   });
 });
