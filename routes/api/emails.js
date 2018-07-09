@@ -11,7 +11,7 @@ const passportConfig = require('../../lib/passport');
 const { sanitizeParam } = require('express-validator/filter');
 
 let filterEmailString = (name) => {
-  if (name.length == 0) return null;
+  if (name.length == 0) return [];
   let processed = [], arr = name.split(',');
   for (var cur of arr) {
     let dataFrom = cur.trim(), from = { email: dataFrom }, start = dataFrom.indexOf('<'), end = dataFrom.indexOf('>');
@@ -49,7 +49,7 @@ router.post(`/${config.parseURL}`, upload.any(), (req, res) => {
   console.log(req.body);
 
   new models.Email({
-    from: filterEmailString(req.body.from),
+    from: filterEmailString(req.body.from)[0],
     html: req.body.html,
     spamFilter: {
       score: req.body.spam_score,
