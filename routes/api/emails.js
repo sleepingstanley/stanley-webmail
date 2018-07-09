@@ -10,14 +10,34 @@ const passportConfig = require('../../lib/passport');
 
 const { sanitizeParam } = require('express-validator/filter');
 
+let filterEmailString = (name) => {
+  if (name.length == 0) return null;
+  let processed = [], arr = name.split(',');
+  for (var cur of arr) {
+    let dataFrom = cur.trim(), from = { email: dataFrom }, start = dataFrom.indexOf('<'), end = dataFrom.indexOf('>');
+    if (start !== -1 && end !== -1) {
+      if (dataFrom.indexOf(' ') !== -1) {
+        from = {
+          name: dataFrom.substring(0, start).trim(),
+          email: dataFrom.substring(start + 1, end).trim()
+        };
+      } else from = { email: dataFrom.substring(start + 1, end).trim() };
+    }
+    processed.push(from);
+  }
+  console.log(name, processed);
+  return processed;
+}
+
 router.get('/', passportConfig.checkAuth, (req, res) => {
-  models.Email.find(admin ? {} : { to: res.locals.user.email }, { from: true, read: true, text: true }).sort({ date: -1 }).then(emails => {
+  let user = res.locals.user;
+  models.Email.find(user.admin ? {} : { to: user.email }, 'from read text to').sort({ date: -1 }).then(emails => {
     res.json(emails);
   });
 });
 
 router.get('/:id', sanitizeParam('id').trim(), passportConfig.checkAuth, (req, res) => {
-  models.Email.findOne({ _id: req.params.id }, { __v: false }, (err, email) => {
+  models.Email.findOne({ _id: req.params.id }, '-__v', (err, email) => {
     if (err)
       return res.status(400).json({ success: false, error: err });
 
@@ -26,21 +46,10 @@ router.get('/:id', sanitizeParam('id').trim(), passportConfig.checkAuth, (req, r
 });
 
 router.post(`/${config.parseURL}`, upload.any(), (req, res) => {
-  let dataFrom = req.body.from, from = { email: dataFrom };
-  if (dataFrom) {
-    let start = dataFrom.indexOf('<'), end = dataFrom.indexOf('>');
-    if (dataFrom.indexOf(' ') !== -1) {
-      from = {
-        name: dataFrom.substring(0, start).trim(),
-        email: dataFrom.substring(start + 1, end).trim()
-      };
-    } else from = { email: dataFrom.substring(start + 1, end).trim() };
-  }
-
   console.log(req.body);
 
   new models.Email({
-    from: from,
+    from: filterEmailString(req.body.from),
     html: req.body.html,
     spamFilter: {
       score: req.body.spam_score,
@@ -48,8 +57,7 @@ router.post(`/${config.parseURL}`, upload.any(), (req, res) => {
     },
     subject: req.body.subject,
     text: req.body.text,
-    to: req.body.to.split(', ')
-    //date: Date,
+    to: filterEmailString(req.body.to)
   }).save().then(email => res.json(email));
 });
 

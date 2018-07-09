@@ -25,7 +25,10 @@ const EmailSchema = new Schema({
   },
   subject: String,
   text: String,
-  to: [String]
+  to: [{
+    name: String,
+    email: String
+  }]
 });
 
 module.exports = mongoose.model('Email', EmailSchema);
