@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 
-import { Table, Checkbox, Menu, Dropdown, Popup } from 'semantic-ui-react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Table, Checkbox, Menu, Dropdown, Popup, Dimmer, Loader } from 'semantic-ui-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArchive, faTrashAlt, faEnvelopeOpen, faTag, faChevronLeft, faChevronRight } from '@fortawesome/pro-light-svg-icons'
 import Moment from 'react-moment';
 
@@ -53,6 +54,11 @@ class EmailList extends Component {
     const { emails } = this.props.email;
     return (
       <div style={{ marginBottom: '10px' }}>
+        {emails.length === 0 ? (
+          <Dimmer active>
+            <Loader content='Loading' />
+          </Dimmer>
+        ) : null}
         <Menu attached>
           <Popup trigger={
             <Menu.Item>
@@ -103,7 +109,9 @@ class EmailList extends Component {
                 </Table.Cell>
                 <Table.Cell collapsing>{from ? (from.name || from.email) : 'no sender'}</Table.Cell>
                 <Table.Cell>
-                  {subject || 'no subject'} - <span style={{ fontWeight: '300' }}>{(text || 'no content').substring(0, 75)}</span>
+                  <Link to={`/view/${_id}`}>
+                    {subject || 'no subject'} - <span style={{ fontWeight: '300' }}>{(text || 'no text preview available').substring(0, 75)}</span>
+                  </Link>
                 </Table.Cell>
                 <Table.Cell collapsing textAlign='right'>
                   <Moment fromNow date={date} />

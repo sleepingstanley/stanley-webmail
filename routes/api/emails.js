@@ -31,17 +31,66 @@ let filterEmailString = (name) => {
 
 router.get('/', passportConfig.checkAuth, (req, res) => {
   let user = res.locals.user;
-  models.Email.find(user.admin ? {} : { 'to.email': user.email }, 'from read text subject to').sort({ date: -1 }).then(emails => {
+  models.Email.find(user.admin ? {} : { 'to.email': user.email }, 'from read text subject to.email to.name date').sort({ date: -1 }).then(emails => {
     res.json(emails);
   });
 });
 
 router.get('/:id', sanitizeParam('id').trim(), passportConfig.checkAuth, (req, res) => {
-  models.Email.findOne({ _id: req.params.id }, '-__v', (err, email) => {
+  let user = res.locals.user, search = { _id: req.params.id }, newFrom = {}, newTo = [];
+  if (!user.admin) search['to.email'] = user.email; // don't let non-admins view other emails (through direct id)
+
+  models.Email.findOne(search, '-__v', (err, email) => {
     if (err)
       return res.status(400).json({ success: false, error: err });
 
-    res.json(email);
+
+    models.User.findOne({
+      'email': (email.from && email.from.email) ? email.from.email.toLowerCase() : ''
+    }, 'name _id', (err, from) => {
+      if (!err && from && email.from) {
+        newFrom = {
+          realName: from.name,
+          _id: from._id,
+          email: email.from.email
+        };
+        if (email.from.name)
+          newFrom.name = `"${email.from.name}"`;
+        if (email.from.email.toLowerCase() === user.email.toLowerCase())
+          newFrom.me = true;
+      }
+      async.each(email.to, (toArr, resolve) => {
+        if (!toArr.email.endsWith('stanleykerr.co')) {
+          newTo.push(toArr);
+          return resolve();
+        } // TODO: populate with actual list later. Store somewhere? database?
+        models.User.findOne({
+          email: toArr.email
+        }, 'name _id', (err, to) => {
+          if (!err && to) {
+            let newE = {
+              realName: to.name,
+              _id: to._id,
+              email: toArr.email
+            };
+            if (toArr.name)
+              newE.name = `"${toArr.name}"`;
+            if (toArr.email.toLowerCase() === user.email.toLowerCase())
+              newE.me = true;
+            newTo.push(newE);
+          }
+          resolve();
+        });
+      }, (err) => {
+        if (err)
+          return res.status(400).json({ success: false, error: err });
+        let newA = Object.assign({}, email, false);
+        newA._doc.from = newFrom;
+        newA._doc.to = newTo;
+        res.json(newA._doc);
+      });
+      //res.json(email);
+    });
   });
 });
 

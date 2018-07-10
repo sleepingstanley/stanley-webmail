@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Button, Form, Segment, Dropdown, Message } from 'semantic-ui-react';
+import { Button, Form, Segment, Dropdown, Message, Divider } from 'semantic-ui-react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock } from '@fortawesome/pro-light-svg-icons';
@@ -60,8 +60,12 @@ class LoginForm extends Component {
             <i className="icon"><FontAwesomeIcon icon={faLock} /></i>
             <input />
           </Form.Input>
-          <Button color='blue' fluid size='large'>
+          <Button primary fluid size='large'>
             Login
+          </Button>
+          <Divider horizontal>Or</Divider>
+          <Button secondary fluid size='large' disabled>
+            Sign Up Now
           </Button>
         </Form>
       </Segment>

@@ -35,7 +35,7 @@ class App extends Component {
               <Route path='/logout' render={props => (
                 Auth.isUserAuthenticated() ? <Logout {...props} /> : <Redirect to='/' />
               )} />
-              <Route path='/view/:email' render={props => (
+              <Route path='/view/:email/:extra?' render={props => (
                 Auth.isUserAuthenticated() ? <ViewEmail {...props} /> : <Redirect to='/' />
               )} />
               <Route component={Error} />

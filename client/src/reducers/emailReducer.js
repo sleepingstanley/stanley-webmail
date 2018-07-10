@@ -1,7 +1,8 @@
-import { GET_EMAILS, DELETE_EMAIL, SEND_EMAIL, EMAILS_LOADING, UPDATE_EMAIL } from '../actions/constants';
+import { GET_EMAILS, GET_EMAIL, DELETE_EMAIL, SEND_EMAIL, EMAILS_LOADING, UPDATE_EMAIL } from '../actions/constants';
 
 const initialState = {
   emails: [],
+  email: null,
   loading: false
 }
 
@@ -17,6 +18,12 @@ export default (state = initialState, action) => {
         emails: action.payload,
         loading: false
       };
+    case GET_EMAIL:
+      return {
+        ...state,
+        email: action.payload,
+        loading: false
+      };
     case DELETE_EMAIL:
       return {
         ...state,
@@ -30,6 +37,7 @@ export default (state = initialState, action) => {
     case EMAILS_LOADING:
       return {
         ...state,
+        email: null,
         loading: true
       };
     case UPDATE_EMAIL:

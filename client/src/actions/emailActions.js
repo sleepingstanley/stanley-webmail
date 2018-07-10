@@ -3,7 +3,7 @@ import { GET_EMAILS, GET_EMAIL, DELETE_EMAIL, SEND_EMAIL, EMAILS_LOADING, UPDATE
 import Auth from '../modules/auth';
 
 export const getEmails = () => dispatch => {
-  dispatch(setItemsLoading());
+  dispatch(setEmailsLoading());
   axios.get('/api/emails', {
     headers: {
       Authorization: `Bearer ${Auth.getToken()}`
@@ -12,18 +12,18 @@ export const getEmails = () => dispatch => {
 };
 
 export const getEmail = id => dispatch => {
-  return new Promise((resolve, reject) => {
-    axios.get(`/api/emails/${id}`, {
-      headers: {
-        Authorization: `Bearer ${Auth.getToken()}`
-      }
-    }).then(res => {
-      dispatch({ type: GET_EMAIL, payload: res.data });
-      resolve();
-    }).catch(err => {
-      reject(err);
-    });
-  });
+  dispatch(setEmailsLoading());
+  axios.get(`/api/emails/${id}`, {
+    headers: {
+      Authorization: `Bearer ${Auth.getToken()}`
+    }
+  }).then(res => {
+    updateEmail([{
+      _id: id,
+      data: { read: true }
+    }]);
+    dispatch({ type: GET_EMAIL, payload: res.data });
+  }).catch(() => dispatch({ type: GET_EMAIL, payload: null }));
 };
 
 export const sendEmail = email => dispatch => {
@@ -41,7 +41,7 @@ export const deleteEmail = ids => dispatch => {
       headers: {
         Authorization: `Bearer ${Auth.getToken()}`
       }
-    }).then(res => dispatch({ type: DELETE_EMAIL, payload: ids }));
+    }).then(() => dispatch({ type: DELETE_EMAIL, payload: ids }));
 };
 
 export const updateEmail = data => dispatch => {
@@ -54,7 +54,7 @@ export const updateEmail = data => dispatch => {
     }).then(res => dispatch({ type: UPDATE_EMAIL, payload: res.data }));
 };
 
-export const setItemsLoading = () => {
+export const setEmailsLoading = () => {
   return {
     type: EMAILS_LOADING
   };
