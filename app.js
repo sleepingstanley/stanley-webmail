@@ -18,6 +18,14 @@ app.use('/api/emails', require(path.join(__dirname, './routes/api/emails')));
 app.use('/api/auth', require(path.join(__dirname, './routes/api/auth')));
 
 if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.headers['x-forwarded-proto'] === 'https') {
+      next();
+    } else {
+      res.redirect('https://' + req.headers.host + req.url);
+    }
+  });
+
   app.use(express.static('./client/build'));
 
   app.get('*', (req, res) => {
