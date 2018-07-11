@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Table, Checkbox, Menu, Dropdown, Popup, Dimmer, Loader } from 'semantic-ui-react';
+import { Table, Checkbox, Menu, Popup, Dimmer, Loader } from 'semantic-ui-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArchive, faTrashAlt, faEnvelopeOpen, faTag, faChevronLeft, faChevronRight } from '@fortawesome/pro-light-svg-icons'
 import Moment from 'react-moment';
@@ -12,7 +12,8 @@ import PropTypes from 'prop-types';
 
 class EmailList extends Component {
   state = {
-    checkboxes: new Map()
+    checkboxes: new Map(),
+    indeterminate: false
   }
 
   componentDidMount() {
@@ -26,7 +27,7 @@ class EmailList extends Component {
       emails.push(_id);
     this.props.deleteEmail(emails);
     tempCheckboxes.clear();
-    this.setState({ checkboxes: tempCheckboxes });
+    this.setState({ ...this.state, checkboxes: tempCheckboxes });
   }
 
   onToggleReadClick = () => {
@@ -36,8 +37,18 @@ class EmailList extends Component {
       emails.push({ _id: _id, data: { read: !read } });
       tempCheckboxes.set(_id, !read);
     }
-    this.setState({ checkboxes: tempCheckboxes });
+    this.setState({ ...this.state, checkboxes: tempCheckboxes });
     this.props.updateEmail(emails);
+  }
+
+  masterCheckbox = () => {
+    let tempCheckboxes = this.state.checkboxes;
+    if(this.state.checkboxes.size > 0) {// already has 1 checked
+      this.tempCheckboxes.clear();
+    } else {
+      this.props.email.emails.forEach(({_id, read}) => tempCheckboxes.set(_id, read));
+    }
+    this.setState({ ...this.state, checkboxes: tempCheckboxes });
   }
 
   toggleCheckbox = (id, read) => {
@@ -47,7 +58,7 @@ class EmailList extends Component {
     } else {
       tempCheckboxes.set(id, read);
     }
-    this.setState({ checkboxes: tempCheckboxes });
+    this.setState({ ...this.state, checkboxes: tempCheckboxes, indeterminate: tempCheckboxes.size > 0 });
   }
 
   render() {
@@ -62,7 +73,7 @@ class EmailList extends Component {
         <Menu attached>
           <Popup trigger={
             <Menu.Item>
-              <Checkbox />
+              <Checkbox onChange={this.masterCheckbox} indeterminate={this.state.indeterminate} />
             </Menu.Item>
           } content='Select all emails' position='bottom center' size='tiny' inverted />
           <Popup trigger={
@@ -86,7 +97,7 @@ class EmailList extends Component {
             </Menu.Item>
           } content='Labels' position='bottom center' size='tiny' inverted />
 
-          <Menu.Menu position='right'>
+          {/*<Menu.Menu position='right'>
             <Dropdown item icon='ellipsis vertical'>
               <Dropdown.Menu>
                 <Dropdown.Item>English</Dropdown.Item>
@@ -94,11 +105,7 @@ class EmailList extends Component {
                 <Dropdown.Item>Spanish</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-
-            {/*<Menu.Item>
-              <Button primary>Sign Up</Button>
-            </Menu.Item>*/}
-          </Menu.Menu>
+          </Menu.Menu>*/}
         </Menu>
         <Table basic selectable attached>
           <Table.Body>

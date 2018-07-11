@@ -10,6 +10,8 @@ import '../stylesheets/App.css';
 import { Container } from 'semantic-ui-react';
 
 import Auth from '../modules/auth';
+import '../modules/client';
+
 import Home from './views/Home';
 import Login from './views/Login';
 import Logout from './views/Logout';
@@ -17,6 +19,15 @@ import ViewEmail from './views/ViewEmail';
 import Error from './views/Error';
 
 import AppNavbar from './AppNavbar';
+
+import { library } from '@fortawesome/fontawesome-svg-core'
+//import { fab } from '@fortawesome/free-brands-svg-icons'
+import { fal } from '@fortawesome/pro-light-svg-icons';
+import { fas } from '@fortawesome/pro-solid-svg-icons';
+//import { far } from '@fortawesome/pro-regular-svg-icons';
+
+library.add(/*fab, */fas, fal/*, far*/);
+
 
 class App extends Component {
   render() {

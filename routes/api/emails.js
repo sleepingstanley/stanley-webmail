@@ -44,6 +44,7 @@ router.get('/:id', sanitizeParam('id').trim(), passportConfig.checkAuth, (req, r
     if (err)
       return res.status(400).json({ success: false, error: err });
 
+    let newA = Object.assign({}, email, false);
 
     models.User.findOne({
       'email': (email.from && email.from.email) ? email.from.email.toLowerCase() : ''
@@ -54,10 +55,11 @@ router.get('/:id', sanitizeParam('id').trim(), passportConfig.checkAuth, (req, r
           _id: from._id,
           email: email.from.email
         };
-        if (email.from.name)
+        if (email.from.name && email.from.name.indexOf('"') === -1)
           newFrom.name = `"${email.from.name}"`;
         if (email.from.email.toLowerCase() === user.email.toLowerCase())
           newFrom.me = true;
+        newA._doc.from = newFrom;
       }
       async.each(email.to, (toArr, resolve) => {
         if (!toArr.email.endsWith('stanleykerr.co')) {
@@ -73,7 +75,7 @@ router.get('/:id', sanitizeParam('id').trim(), passportConfig.checkAuth, (req, r
               _id: to._id,
               email: toArr.email
             };
-            if (toArr.name)
+            if (toArr.name && toArr.name.indexOf('"') === -1)
               newE.name = `"${toArr.name}"`;
             if (toArr.email.toLowerCase() === user.email.toLowerCase())
               newE.me = true;
@@ -84,8 +86,6 @@ router.get('/:id', sanitizeParam('id').trim(), passportConfig.checkAuth, (req, r
       }, (err) => {
         if (err)
           return res.status(400).json({ success: false, error: err });
-        let newA = Object.assign({}, email, false);
-        newA._doc.from = newFrom;
         newA._doc.to = newTo;
         res.json(newA._doc);
       });

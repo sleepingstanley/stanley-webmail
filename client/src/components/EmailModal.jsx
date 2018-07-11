@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import { Button, Form, Modal } from 'semantic-ui-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope } from '@fortawesome/pro-light-svg-icons'
 
 import { connect } from 'react-redux';
 import { sendEmail } from '../actions/emailActions';
@@ -44,19 +43,15 @@ class EmailModal extends Component {
   render() {
     return (
       <Modal open={this.state.modalOpen} onClose={this.toggle} trigger={
-        <Button icon labelPosition='right' onClick={this.toggle}>
-          Send Email
-          <i className="icon"><FontAwesomeIcon icon={faEnvelope} /></i>
+        <Button icon labelPosition='left' color='red' style={{marginBottom: '10px'}} onClick={this.toggle}>
+          <i className="icon"><FontAwesomeIcon icon='paper-plane' /></i>
+          Compose Email
         </Button>
       }>
         <Modal.Header>New Email</Modal.Header>
         <Modal.Content>
           <Modal.Description>
             <Form>
-              <Form.Group widths='equal'>
-                <Form.Input fluid onChange={this.onChange} name='from_email' label='From email' placeholder='From email' />
-                <Form.Input fluid onChange={this.onChange} name='from_name' label='From name' placeholder='From name' />
-              </Form.Group>
               <Form.Input fluid onChange={this.onChange} name='to' label='To' placeholder='To' />
               <Form.Input fluid onChange={this.onChange} name='subject' label='Subject' placeholder='Subject' />
               <Form.TextArea onChange={this.onChange} name='body' label='Body' placeholder='' />
@@ -64,9 +59,9 @@ class EmailModal extends Component {
           </Modal.Description>
         </Modal.Content>
         <Modal.Actions>
-          <Button primary icon labelPosition='right' onClick={this.onSubmit}>
+          <Button primary icon labelPosition='left' onClick={this.onSubmit}>
+            <i className="icon"><FontAwesomeIcon icon='paper-plane' /></i>
             Send Email
-            <i className="icon"><FontAwesomeIcon icon={faEnvelope} /></i>
           </Button>
         </Modal.Actions>
       </Modal>

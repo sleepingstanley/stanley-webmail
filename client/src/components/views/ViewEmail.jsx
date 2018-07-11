@@ -1,32 +1,42 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Grid, Header, Message, Segment, Label, Dimmer, Loader, Breadcrumb, Divider, Button, Popup } from 'semantic-ui-react';
+import { Grid, Header, Message, Segment, Label, Dimmer, Loader, Breadcrumb, Divider, Button } from 'semantic-ui-react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExclamationCircle, faExclamation, faEnvelope, faFlag, faUser, faUserPlus, faUserCircle, faUserMinus, faPaperPlane } from '@fortawesome/pro-solid-svg-icons';
+import { faExclamationCircle, faExclamation, faEnvelope, faFlag } from '@fortawesome/pro-solid-svg-icons';
 
 import { connect } from 'react-redux';
 import { getEmail } from '../../actions/emailActions';
 import { reauthenticateUser } from '../../actions/authActions';
 import PropTypes from 'prop-types';
+import UserLabel from '../UserLabel';
 
 class ViewEmail extends Component {
   componentDidMount() {
-    document.title = 'stanley-webmail / view email';
     if (Object.keys(this.props.auth.user).length === 0) {
       this.props.reauthenticateUser().catch(() => this.context.router.history.push('/'));
     }
     const { match: { params: { email } } } = this.props;
     this.props.getEmail(email);
+    document.title = 'stanley-webmail / loading email';
+  }
+
+  componentDidUpdate() {
+    const { match: { params: { extra } }, email: { email, loading } } = this.props;
+    const bypass = extra && !extra.localeCompare('bypass');
+    if(email === null || loading) {
+      document.title = 'stanley-webmail / loading email';
+    } else {
+      document.title = 'stanley-webmail / view email - ' + (email.subject || 'No subject') + (bypass ? ' / bypass' : '');
+    }
   }
 
   render() {
-    const { match: { params: { extra } } } = this.props;
+    const { match: { params: { extra } }, email: { email, loading } } = this.props;
     const bypass = extra && !extra.localeCompare('bypass');
-    const { email: { email, loading } } = this.props;
     return (
-      <div className='view-email'>
+      <React.Fragment>
         {email === null && loading ? (
           <Dimmer active>
             <Loader content='Loading' />
@@ -51,14 +61,14 @@ class ViewEmail extends Component {
                     </Message.Content>
                   </Message>
                 ) : (
-                    <div className='email'>
+                    <React.Fragment>
                       {email.spamFilter.pass ? null : bypass ?
                         <Message icon warning>
                           <i className='icon'><FontAwesomeIcon icon={faExclamationCircle} /></i>
                           <Message.Content>
                             <Message.Header>Message fully displayed</Message.Header>
                             Email has been flagged as spam, but you chose to display the full message anyways.<br />
-                            <Button as={Link} to={`/view/${email._id}`} color='yellow' size="tiny" icon labelPosition='left' style={{ marginTop: '10px' }}>
+                            <Button as={Link} to={`/view/${email._id}`} replace color='yellow' size="tiny" icon labelPosition='left' style={{ marginTop: '10px' }}>
                               <i className='icon'><FontAwesomeIcon icon={faExclamation} /></i>
                               Hide Content
                             </Button>
@@ -70,7 +80,7 @@ class ViewEmail extends Component {
                           <Message.Content>
                             <Message.Header>Message not fully displayed</Message.Header>
                             Email has been flagged as spam<br />
-                            <Button as={Link} to={`/view/${email._id}/bypass`} negative size='tiny' icon labelPosition='left' style={{ marginTop: '10px' }}>
+                            <Button as={Link} to={`/view/${email._id}/bypass`} replace negative size='tiny' icon labelPosition='left' style={{ marginTop: '10px' }}>
                               <i className='icon'><FontAwesomeIcon icon={faExclamation} /></i>
                               Show Content
                             </Button>
@@ -88,83 +98,11 @@ class ViewEmail extends Component {
                           {email.spamFilter.pass ? null : <Label color='red' size='tiny'><i className='icon'><FontAwesomeIcon icon={faFlag} /></i>Spam</Label>}
                           <Header.Subheader style={{ verticalAlign: 'middle !important', marginTop: '5px' }}>
                             {/* TODO: MAKE USER LABEL COMPONENT */}
-                            From: {email.from && (email.from.name || email.from.email) ? (
-                              <Popup trigger={
-                                <Label style={{ cursor: 'pointer' }}>
-                                  <i className='icon'><FontAwesomeIcon icon={faUser} /></i>
-                                  {(email.from.name || email.from.realName || email.from.email) + (email.from.me ? ' (me)' : '')}
-                                </Label>
-                              } on='click' position='bottom center' flowing>
-                                <Grid>
-                                  <Grid.Column>
-                                    <Header as='h3'>
-                                      <i className='icon'><FontAwesomeIcon icon={faUserCircle} /></i>
-                                      <Header.Content>
-                                        {(email.from.realName || email.from.name || email.from.email) + (email.from.me ? ' (me)' : '')}
-                                        {!email.from.realName && email.from.name ? <Header.Subheader>{email.from.name}</Header.Subheader> : null}
-                                        {email.from.realName || email.from.name ? <Header.Subheader>{email.from.email}</Header.Subheader> : null}
-                                      </Header.Content>
-                                    </Header>
-                                    {/*<p>
-                                      TODO: Future status for registered friends? (or other details)
-                                    </p>*/}
-
-                                    {email.from.realName ?
-                                      <Button color='green' size='tiny' fluid icon labelPosition='left' style={{ marginTop: '10px' }}>
-                                        <i className='icon'><FontAwesomeIcon icon={faUserPlus} /></i>
-                                        Add Friend
-                                      </Button>
-                                      :
-                                      <Button primary size='tiny' fluid icon labelPosition='left' style={{ marginTop: '10px' }}>
-                                        <i className='icon'><FontAwesomeIcon icon={faPaperPlane} /></i>
-                                        Send Invite
-                                      </Button>
-                                    }
-                                  </Grid.Column>
-                                </Grid>
-                              </Popup>
-                            ) : 'No Sender'}
+                            From: <UserLabel to={email.from} />
                           </Header.Subheader>
                           <Header.Subheader style={{ verticalAlign: 'middle !important', marginTop: '5px' }}>
                             To: {email.to.map(to => (
-                              <Popup key={to._id} trigger={
-                                <Label style={{ cursor: 'pointer' }}>
-                                  <i className='icon'><FontAwesomeIcon icon={faUser} /></i>
-                                  {(to.name || to.realName || to.email) + (to.me ? ' (me)' : '') /* TODO: Check to & from emails to see if they have account. If so, add realName & realID */}
-                                </Label>
-                              } on='click' position='bottom center' flowing>
-                                <Grid>
-                                  <Grid.Column>
-                                    <Header as='h3'>
-                                      <i className='icon'><FontAwesomeIcon icon={faUserCircle} /></i>
-                                      <Header.Content>
-                                        {(to.realName || to.name || to.email) + (to.me ? ' (me)' : '')}
-                                        {!to.realName && to.name ? <Header.Subheader>{to.name}</Header.Subheader> : null}
-                                        {to.realName || to.name ? <Header.Subheader>{to.email}</Header.Subheader> : null}
-                                      </Header.Content>
-                                    </Header>
-                                    {/*<p>
-                                      TODO: Future status for registered friends? (or other details)
-                                    </p>*/}
-                                    {to.me ?
-                                      <Button secondary disabled size='tiny' fluid icon labelPosition='left' style={{ marginTop: '10px' }}>
-                                        <i className='icon'><FontAwesomeIcon icon={faUserMinus} /></i>
-                                        Remove Friend
-                                      </Button>
-                                      : to.realName ?
-                                        <Button color='green' size='tiny' fluid icon labelPosition='left' style={{ marginTop: '10px' }}>
-                                          <i className='icon'><FontAwesomeIcon icon={faUserPlus} /></i>
-                                          Add Friend
-                                      </Button>
-                                        :
-                                        <Button primary size='tiny' fluid icon labelPosition='left' style={{ marginTop: '10px' }}>
-                                          <i className='icon'><FontAwesomeIcon icon={faPaperPlane} /></i>
-                                          Send Invite
-                                      </Button>
-                                    }
-                                  </Grid.Column>
-                                </Grid>
-                              </Popup>
+                              <UserLabel key={to._id} to={to} />
                             ))}
                           </Header.Subheader>
                         </Header.Content>
@@ -174,12 +112,12 @@ class ViewEmail extends Component {
                         <i className='icon'><FontAwesomeIcon icon={faExclamationCircle} /></i>
                         Email responses are currently disabled.
                       </Message>
-                    </div>
+                    </React.Fragment>
                   )}
               </Grid.Column>
             </Grid>
           )}
-      </div>
+      </React.Fragment>
     );
   }
 }
