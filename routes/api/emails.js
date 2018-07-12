@@ -123,10 +123,7 @@ router.post(`/${config.parseURL}`, upload.any(), (req, res) => {
       models.User.findOne({ email: to.email}, '_id', (err, {_id}) => {
         if(err) return;
         console.log('found ' + _id + ', trying to emit to any sockets');
-        //let {from, read, text, subject, to, date} = email;
-        res.app.locals.io.to(_id).emit('new-email', {
-          email: {from, read, text, subject, to, date}
-        });
+        res.app.locals.io.to(_id).emit('new-email', { from: email.from, read: email.read, text: email.text, subject: email.subject, to: email.to, date: email.date });
       });
     });
   });
