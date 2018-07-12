@@ -35,7 +35,7 @@ const routes = [
     path: '/',
     exact: true,
     auth: Home,
-    noAuth: <Redirect to ='/login' />
+    noAuth: <Redirect to='/login' />
   }, {
     path: '/login',
     auth: <Redirect to='/' />,
@@ -43,6 +43,10 @@ const routes = [
   }, {
     path: '/logout',
     auth: Logout,
+    noAuth: <Redirect to='/' />
+  }, {
+    path: '/view/:email/:extra?',
+    auth: ViewEmail,
     noAuth: <Redirect to='/' />
   }
 ];
@@ -58,22 +62,10 @@ class App extends Component {
               <Page socket={Socket}>
                 <Switch>
                   {
-                    routes.map((data, index) => (
-                      <Route key={index} exact={data.exact || false} path={data.path} render={props => data.noAuth ? (Auth.isUserAuthenticated() ? data.auth instanceof Object ? data.auth : <data.auth {...props} /> : data.noAuth instanceof Object ? data.noAuth : <data.noAuth {...props} />) : data.auth instanceof Object ? data.auth : <data.auth {...props} /> }/>
-                    ))
+                    routes.map((data, index) => {
+                      return (<Route key={index} exact={data.exact || false} path={data.path} render={props => data.noAuth ? (Auth.isUserAuthenticated() ? data.auth instanceof Component ? data.auth : <data.auth {...props} /> : data.noAuth instanceof Component ? data.noAuth : <data.noAuth {...props} />) : data.auth instanceof Component ? data.auth : <data.auth {...props} />} />)
+                    })
                   }
-                  {/*<Route exact path='/' render={props => (
-                    Auth.isUserAuthenticated() ? <Home {...props} /> : <Redirect to='/login' />
-                  )} />
-                  <Route path='/login' render={props => (
-                    Auth.isUserAuthenticated() ? <Redirect to='/' /> : <Login {...props} />
-                  )} />
-                  <Route path='/logout' render={props => (
-                    Auth.isUserAuthenticated() ? <Logout {...props} /> : <Redirect to='/' />
-                  )} />*/}
-                  <Route path='/view/:email/:extra?' render={props => (
-                    Auth.isUserAuthenticated() ? <ViewEmail {...props} /> : <Redirect to='/' />
-                  )} />
                   <Route component={Error} />
                 </Switch>
               </Page>
