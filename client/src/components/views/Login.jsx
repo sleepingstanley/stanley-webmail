@@ -12,7 +12,6 @@ import LoginForm from '../LoginForm';
 class Login extends Component {
   componentDidMount() {
     document.title = 'stanley-webmail / login';
-    console.log(this.props);
   }
 
   render() {
@@ -23,7 +22,7 @@ class Login extends Component {
             <Header as='h2' textAlign='center'>
               Log-in to your account
             </Header>
-            <LoginForm />
+            <LoginForm socket={this.props.socket} />
             <Message negative attached='bottom' style={{ textAlign: 'left' }}>
               <i className="icon"><FontAwesomeIcon icon={faExclamationCircle} /></i>
               Account creation is currently disabled.
@@ -36,7 +35,7 @@ class Login extends Component {
   }
 }
 
-Login.contextTypes = {
+Login.propTypes = {
   socket: PropTypes.object.isRequired
 };
 

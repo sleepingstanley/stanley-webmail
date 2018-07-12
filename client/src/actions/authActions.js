@@ -2,11 +2,11 @@ import axios from 'axios';
 import { AUTHENTICATE_USER, DEAUTHENTICATE_USER } from './constants';
 import Auth from '../modules/auth';
 
-export const authenticateUser = login => dispatch => {
+export const authenticateUser = (login, socket) => dispatch => {
   return new Promise((resolve, reject) => {
     axios.post('/api/auth/login', login)
       .then(res => {
-        dispatch({ type: AUTHENTICATE_USER, payload: res.data });
+        dispatch({ type: AUTHENTICATE_USER, payload: {...res.data, socket} });
         resolve();
       }).catch(err => {
         dispatch({ type: AUTHENTICATE_USER, payload: err.response.data });

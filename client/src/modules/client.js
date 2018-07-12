@@ -1,5 +1,9 @@
-import React from 'react';
 import io from 'socket.io-client';
+import { GET_EMAILS } from '../actions/constants';
+
+let dispatch = (msg, payload) => {
+  console.log(`[ERR] Tried to dispatch '${msg}':`, payload);
+};
 
 const host = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000';
 
@@ -10,8 +14,15 @@ const socket = io(host, {
   
 socket.on('data', (data) => {
   console.log(data);
-  //dispatchEvent(SOCKET_DISCONNECT);
 });
 
-export const Socket = socket;
-export const SocketContext = React.createContext(socket);
+socket.on('new-email', (data) => {
+  console.log(data);
+});
+
+export default {
+  init(store) {
+    dispatch = store.dispatch;
+  },
+  Socket: socket
+};

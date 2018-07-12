@@ -19,21 +19,19 @@ export default (state = initialState, action) => {
         };
       }
       Auth.authenticateUser(payload.token);
-      if(payload.socket) {
-        payload.socket.emit('authenticate', 'hello, its ' + payload.user.name);
-      }
+      if(payload.socket)
+        payload.socket.emit('authenticate', payload.token);
       return {
         ...state,
         errors: [],
-        token: Auth.getToken(),
+        token: payload.token,
         user: payload.user,
         authenticated: true
       };
     case DEAUTHENTICATE_USER:
+      if(payload.socket)
+        payload.socket.emit('deauthenticate');
       Auth.deauthenticateUser();
-      if(payload.socket) {
-        payload.socket.emit('authenticate', 'goodbye from ' + state.user.name);
-      }
       return {
         ...state,
         token: Auth.getToken(),

@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const async = require('async');
 const passport = require('passport');
 const passportConfig = require('../../lib/passport');
 

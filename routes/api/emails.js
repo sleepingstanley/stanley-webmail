@@ -25,7 +25,7 @@ let filterEmailString = (name) => {
     }
     processed.push(from);
   }
-  console.log(name, processed);
+  //console.log(name, processed);
   return processed;
 }
 
@@ -34,6 +34,11 @@ router.get('/', passportConfig.checkAuth, (req, res) => {
   models.Email.find(user.admin ? {} : { 'to.email': user.email }, 'from read text subject to.email to.name date').sort({ date: -1 }).then(emails => {
     res.json(emails);
   });
+});
+
+router.get('/test', (req, res) => {
+  res.app.locals.io.to('5b41d4d7043fe672e4b70759').emit('data', 'hello world');
+  res.json({msg: 'test'});
 });
 
 router.get('/:id', sanitizeParam('id').trim(), passportConfig.checkAuth, (req, res) => {
@@ -89,13 +94,12 @@ router.get('/:id', sanitizeParam('id').trim(), passportConfig.checkAuth, (req, r
         newA._doc.to = newTo;
         res.json(newA._doc);
       });
-      //res.json(email);
     });
   });
 });
 
 router.post(`/${config.parseURL}`, upload.any(), (req, res) => {
-  console.log(req.body);
+  //console.log(req.body);
 
   new models.Email({
     from: filterEmailString(req.body.from)[0],
@@ -107,11 +111,26 @@ router.post(`/${config.parseURL}`, upload.any(), (req, res) => {
     subject: req.body.subject,
     text: req.body.text,
     to: filterEmailString(req.body.to)
-  }).save().then(email => res.json(email));
+  }).save().then(email => {
+    res.json(email);
+    if(!email.to) return;
+    models.Email.find(user.admin ? {} : { 'to.email': user.email }, 'from read text subject to.email to.name date').sort({ date: -1 }).then(emails => {
+      res.json(emails);
+    });
+    email.to.filter(to => to.email).forEach(to => {
+      models.User.findOne({ email: to.email}, '_id', (err, {_id}) => {
+        if(err) return;
+        //let {from, read, text, subject, to, date} = email;
+        res.app.locals.io.to(_id).emit('new-email', {
+          email: {from, read, text, subject, to, date}
+        });
+      });
+    });
+  });
 });
 
 router.post(`/update`, passportConfig.checkAuth, (req, res) => {
-  let data = new Array();
+  let data = [];
 
   async.each(req.body.data, (element, callback) => {
     models.Email.findOneAndUpdate({ _id: element._id }, element.data, { new: true }, (err, email) => {

@@ -21,12 +21,6 @@ class LoginForm extends Component {
     password: ''
   }
 
-  componentDidMount() {
-    if(this.context.socket) {
-      console.log('houston, we have a socket!');
-    } else { console.error('yeah, no socket. sorry bud'); }
-  }
-
   onChange = (e, { name, value }) => {
     this.setState({ [name]: value });
   }
@@ -38,7 +32,7 @@ class LoginForm extends Component {
       password: this.state.password
     };
 
-    this.props.authenticateUser(login).then(() => this.context.router.history.push('/')).catch(() => {});
+    this.props.authenticateUser(login, this.props.socket).then(() => this.context.router.history.push('/')).catch(() => {});
 
     //this.setState({ to: undefined, from_email: undefined, from_name: undefined, subject: undefined, body: undefined });
     //this.toggle();
@@ -78,12 +72,12 @@ class LoginForm extends Component {
 
 LoginForm.propTypes = {
   authenticateUser: PropTypes.func.isRequired,
-  auth: PropTypes.object.isRequired
+  auth: PropTypes.object.isRequired,
+  socket: PropTypes.object.isRequired
 }
 
 LoginForm.contextTypes = {
-  router: PropTypes.object.isRequired,
-  socket: PropTypes.object.isRequired
+  router: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
