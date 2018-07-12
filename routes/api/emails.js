@@ -99,8 +99,6 @@ router.get('/:id', sanitizeParam('id').trim(), passportConfig.checkAuth, (req, r
 });
 
 router.post(`/${config.parseURL}`, upload.any(), (req, res) => {
-  //console.log(req.body);
-
   new models.Email({
     from: filterEmailString(req.body.from)[0],
     html: req.body.html,
@@ -114,16 +112,12 @@ router.post(`/${config.parseURL}`, upload.any(), (req, res) => {
   }).save().then(email => {
     res.json(email);
     if(!email.to) {
-      console.log('no email.to');
       return;
     }
-    console.log('email.to');
     email.to.filter(to => to.email).forEach(to => {
-      console.log('looking for ' + to.email);
       models.User.findOne({ email: to.email}, '_id', (err, {_id}) => {
         if(err) return;
-        console.log('found ' + _id + ', trying to emit to any sockets');
-        res.app.locals.io.to(_id).emit('new-email', { from: email.from, read: email.read, text: email.text, subject: email.subject, to: email.to, date: email.date });
+        res.app.locals.io.to(_id).emit('new-email', { from: email.from, read: email.read, text: email.text, subject: email.subject, date: email.date });
       });
     });
   });
