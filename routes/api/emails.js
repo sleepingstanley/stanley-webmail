@@ -113,13 +113,16 @@ router.post(`/${config.parseURL}`, upload.any(), (req, res) => {
     to: filterEmailString(req.body.to)
   }).save().then(email => {
     res.json(email);
-    if(!email.to) return;
-    models.Email.find(user.admin ? {} : { 'to.email': user.email }, 'from read text subject to.email to.name date').sort({ date: -1 }).then(emails => {
-      res.json(emails);
-    });
+    if(!email.to) {
+      console.log('no email.to');
+      return;
+    }
+    console.log('email.to');
     email.to.filter(to => to.email).forEach(to => {
+      console.log('looking for ' + to.email);
       models.User.findOne({ email: to.email}, '_id', (err, {_id}) => {
         if(err) return;
+        console.log('found ' + _id + ', trying to emit to any sockets');
         //let {from, read, text, subject, to, date} = email;
         res.app.locals.io.to(_id).emit('new-email', {
           email: {from, read, text, subject, to, date}
