@@ -10,7 +10,7 @@
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "heroku-prebuild": "node scripts/set-npmrc.js",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm i --prefix client && npm run build --prefix client"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm i --prefix client && npm run build --prefix client && rm -rf (\"client/src\"|\"client/node_modules\")"
   },
   "repository": "github:sleepingstanley/stanley-webmail",
   "author": "Stanley Kerr",
