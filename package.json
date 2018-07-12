@@ -9,13 +9,10 @@
     "server": "set WEBMAIL_PARSE_URL=parse&& nodemon app.js",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "heroku-prebuild": "node set-npmrc.js",
+    "heroku-prebuild": "node scripts/set-npmrc.js",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm i --prefix client && npm run build --prefix client"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sleepingstanley/stanley-webmail.git"
-  },
+  "repository": "github:sleepingstanley/stanley-webmail",
   "author": "Stanley Kerr",
   "license": "ISC",
   "bugs": {
