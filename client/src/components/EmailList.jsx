@@ -62,37 +62,37 @@ class EmailList extends Component {
   }
 
   render() {
-    const { emails } = this.props.email;
+    const { emails, loading } = this.props.email;
     return (
       <div style={{ marginBottom: '10px' }}>
-        {emails.length === 0 ? (
+        {loading ? (
           <Dimmer active>
             <Loader content='Loading' />
           </Dimmer>
         ) : null}
         <Menu attached>
           <Popup trigger={
-            <Menu.Item>
-              <Checkbox onChange={this.masterCheckbox} indeterminate={this.state.indeterminate} />
+            <Menu.Item disabled={emails.length === 0}>
+              <Checkbox onChange={this.masterCheckbox} indeterminate={this.state.indeterminate} disabled={emails.length === 0} />
             </Menu.Item>
           } content='Select all emails' position='bottom center' size='tiny' inverted />
           <Popup trigger={
-            <Menu.Item icon className="borderless">
+            <Menu.Item icon className="borderless" disabled={emails.length === 0}>
               <i className="icon"><FontAwesomeIcon icon={faArchive} /></i>
             </Menu.Item>
           } content='Archive' position='bottom center' size='tiny' inverted />
           <Popup trigger={
-            <Menu.Item icon onClick={this.onDeleteClick}>
+            <Menu.Item icon onClick={this.onDeleteClick} disabled={emails.length === 0}>
               <i className="icon"><FontAwesomeIcon icon={faTrashAlt} /></i>
             </Menu.Item>
           } content='Delete' position='bottom center' size='tiny' inverted />
           <Popup trigger={
-            <Menu.Item icon onClick={this.onToggleReadClick} className="borderless">
+            <Menu.Item icon onClick={this.onToggleReadClick} className="borderless" disabled={emails.length === 0}>
               <i className="icon"><FontAwesomeIcon icon={faEnvelopeOpen} /></i>
             </Menu.Item>
           } content={this.state.checkboxes.size === 1 ? (this.state.checkboxes.values().next().value ? 'Mark as unread' : 'Mark as read') : 'Toggle read'} position='bottom center' size='tiny' inverted />
           <Popup trigger={
-            <Menu.Item icon>
+            <Menu.Item icon disabled={emails.length === 0}>
               <i className="icon"><FontAwesomeIcon icon={faTag} /></i>
             </Menu.Item>
           } content='Labels' position='bottom center' size='tiny' inverted />
@@ -109,7 +109,7 @@ class EmailList extends Component {
         </Menu>
         <Table basic selectable attached>
           <Table.Body>
-            {emails.map(({ _id, from, subject, date, read, text }) => (
+            {emails.length > 0 ? emails.map(({ _id, from, subject, date, read, text }) => (
               <Table.Row key={_id} active={this.state.checkboxes.has(_id)} style={read ? {} : { fontWeight: 'bold' }}>
                 <Table.Cell collapsing>
                   <Checkbox checked={this.state.checkboxes.has(_id)} onChange={this.toggleCheckbox.bind(this, _id, read)} />
@@ -124,7 +124,13 @@ class EmailList extends Component {
                   <Moment fromNow date={date} />
                 </Table.Cell>
               </Table.Row>
-            ))}
+            )) : (
+              <Table.Row>
+                <Table.Cell colsplan='7'>
+                  No emails found in inbox.
+                </Table.Cell>
+              </Table.Row>
+            )}
           </Table.Body>
           <Table.Footer>
             <Table.Row>
