@@ -5,11 +5,14 @@ import { Grid, Header, Message } from 'semantic-ui-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationCircle } from '@fortawesome/pro-solid-svg-icons';
 
+import PropTypes from 'prop-types';
+
 import LoginForm from '../LoginForm';
 
 class Login extends Component {
   componentDidMount() {
     document.title = 'stanley-webmail / login';
+    console.log(this.props);
   }
 
   render() {
@@ -32,5 +35,9 @@ class Login extends Component {
     );
   }
 }
+
+Login.contextTypes = {
+  socket: PropTypes.object.isRequired
+};
 
 export default Login;

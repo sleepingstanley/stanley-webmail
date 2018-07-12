@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Button, Form, Segment, Dropdown, Message, Divider } from 'semantic-ui-react';
+import { Button, Form, Segment, Dropdown, Message } from 'semantic-ui-react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock } from '@fortawesome/pro-light-svg-icons';
@@ -11,8 +11,7 @@ import PropTypes from 'prop-types';
 
 const options = [
   { key: '@stanleykerr.co', text: '@stanleykerr.co', value: '@stanleykerr.co' },
-  { key: '@tmp.stanleykerr.co', text: '@tmp.stanleykerr.co', value: '@tmp.stanleykerr.co' },
-  { key: '@stanstown.com', text: '@stanstown.com', value: '@stanstown.com' },
+  { key: '@tmp.stanleykerr.co', text: '@tmp.stanleykerr.co', value: '@tmp.stanleykerr.co' }
 ];
 
 class LoginForm extends Component {
@@ -20,6 +19,12 @@ class LoginForm extends Component {
     username: '',
     domain: '@stanleykerr.co',
     password: ''
+  }
+
+  componentDidMount() {
+    if(this.context.socket) {
+      console.log('houston, we have a socket!');
+    } else { console.error('yeah, no socket. sorry bud'); }
   }
 
   onChange = (e, { name, value }) => {
@@ -33,7 +38,7 @@ class LoginForm extends Component {
       password: this.state.password
     };
 
-    this.props.authenticateUser(login).then(() => this.context.router.history.push('/'));
+    this.props.authenticateUser(login).then(() => this.context.router.history.push('/')).catch(() => {});
 
     //this.setState({ to: undefined, from_email: undefined, from_name: undefined, subject: undefined, body: undefined });
     //this.toggle();
@@ -51,7 +56,7 @@ class LoginForm extends Component {
             style={{ textAlign: 'left' }}
             list={errors}
           />
-          <Form.Input onChange={this.onChange} fluid iconPosition='left' placeholder='E-mail address' name='username' action>
+          <Form.Input onChange={this.onChange} fluid iconPosition='left' placeholder='Username' name='username' action>
             <i className="icon"><FontAwesomeIcon icon={faUser} /></i>
             <input />
             <Dropdown onChange={this.onChange} button defaultValue='@stanleykerr.co' options={options} name='domain' />
@@ -60,13 +65,11 @@ class LoginForm extends Component {
             <i className="icon"><FontAwesomeIcon icon={faLock} /></i>
             <input />
           </Form.Input>
-          <Button primary fluid size='large'>
-            Login
-          </Button>
-          <Divider horizontal>Or</Divider>
-          <Button secondary fluid size='large' disabled>
-            Sign Up Now
-          </Button>
+          <Button.Group fluid size='large'>
+            <Button primary>Login</Button>
+            <Button.Or />
+            <Button secondary disabled>Register</Button>
+          </Button.Group>
         </Form>
       </Segment>
     );
@@ -79,7 +82,8 @@ LoginForm.propTypes = {
 }
 
 LoginForm.contextTypes = {
-  router: PropTypes.object.isRequired
+  router: PropTypes.object.isRequired,
+  socket: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({

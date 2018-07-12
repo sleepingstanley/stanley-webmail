@@ -6,17 +6,12 @@ import PropTypes from 'prop-types';
 import { Header } from 'semantic-ui-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { reauthenticateUser } from '../../actions/authActions';
-
 import EmailList from '../EmailList';
 import EmailModal from '../EmailModal';
 
 class Home extends Component {
   componentDidMount() {
     document.title = 'stanley-webmail / home';
-    if (Object.keys(this.props.auth.user).length === 0) {
-      this.props.reauthenticateUser().catch(() => this.context.router.history.push('/'));
-    }
   }
 
   render() {
@@ -43,16 +38,11 @@ class Home extends Component {
 }
 
 Home.propTypes = {
-  reauthenticateUser: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired
 }
-
-Home.contextTypes = {
-  router: PropTypes.object.isRequired
-};
 
 const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(mapStateToProps, { reauthenticateUser })(Home);
+export default connect(mapStateToProps)(Home);

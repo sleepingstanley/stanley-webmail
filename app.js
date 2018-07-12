@@ -7,6 +7,8 @@ const passportConfig = require('./lib/passport');
 const config = require('./config');
 
 const app = express();
+const server = require('http').createServer(app);
+
 app.use(bodyParser.json());
 app.use(passport.initialize());
 
@@ -35,4 +37,6 @@ if (process.env.NODE_ENV === 'production') {
 
 const port = process.env.PORT || 5000;
 
-require('./lib/server')(app).listen(port, () => console.log(`Server started on port ${port}`))
+require('./lib/server')(app, server).then(() => {
+  server.listen(port, () => console.log(`Server started on port ${port}`));
+});

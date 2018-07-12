@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 class Logout extends Component {
   componentDidMount() {
     document.title = 'stanley-webmail / logging out';
-    this.props.deauthenticateUser().then(() => this.context.router.history.push('/'));
+    this.props.deauthenticateUser(this.props.socket).then(() => this.context.router.history.push('/'));
   }
 
   render() {
@@ -17,6 +17,10 @@ class Logout extends Component {
 
 Logout.contextTypes = {
   router: PropTypes.object.isRequired
+};
+
+Logout.propTypes = {
+  socket: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({

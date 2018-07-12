@@ -15,7 +15,7 @@ export const authenticateUser = login => dispatch => {
   });
 };
 
-export const reauthenticateUser = () => dispatch => {
+export const reauthenticateUser = socket => dispatch => {
   return new Promise((resolve, reject) => {
     axios.post('/api/auth/update', null, {
       headers: {
@@ -27,20 +27,21 @@ export const reauthenticateUser = () => dispatch => {
         payload: {
           success: true,
           token: Auth.getToken(),
-          user: res.data.user
+          user: res.data.user,
+          socket: socket
         }
       });
       resolve();
     }).catch(err => {
-      dispatch({ type: DEAUTHENTICATE_USER });
-      reject();
+      dispatch({ type: DEAUTHENTICATE_USER, payload: { socket: socket } });
+      reject(err);
     });
   });
 };
 
-export const deauthenticateUser = () => dispatch => {
+export const deauthenticateUser = socket => dispatch => {
   return new Promise((resolve) => {
-    dispatch({ type: DEAUTHENTICATE_USER });
+    dispatch({ type: DEAUTHENTICATE_USER, payload: { socket: socket } });
     resolve();
   });
 };
